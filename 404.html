@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Quiz sobre a Caatinga 8º B</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f8ff;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            padding: 15px;
+        }
+        .quiz-step {
+            display: none;
+        }
+        .quiz-step.active {
+            display: block;
+        }
+        .result {
+            margin-top: 20px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            box-sizing: border-box;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        canvas {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Quiz sobre o Bioma Caatinga 8º ano B</h1>
+        <form id="quiz">
+            <div class="quiz-step active" id="step1">
+                <p>1. Qual é a característica mais marcante da Caatinga?</p>
+                <label><input type="radio" name="q1" value="a"> A - Florestas densas</label><br>
+                <label><input type="radio" name="q1" value="b"> B - Clima seco e vegetação adaptada à aridez</label><br>
+                <label><input type="radio" name="q1" value="c"> C - Presença constante de neblina</label><br>
+                <button type="button" onclick="nextStep(2)">Próxima</button>
+            </div>
+            <div class="quiz-step" id="step2">
+                <p>2. De onde vem o nome Caatinga?</p>
+                <label><input type="radio" name="q2" value="a"> A - guajajara</label><br>
+                <label><input type="radio" name="q2" value="b"> B - Tupi</label><br>
+                <label><input type="radio" name="q2" value="c"> C - yanomami</label><br>
+                <button type="button" onclick="nextStep(3)">Próxima</button>
+            </div>
+            <div class="quiz-step" id="step3">
+                <p>3. Qual é a porcentagem correspondente da Caatinga no Brasil?</p>
+                <label><input type="radio" name="q3" value="a"> A - 10%</label><br>
+                <label><input type="radio" name="q3" value="b"> B - 30%</label><br>
+                <label><input type="radio" name="q3" value="c"> C - 25%</label><br>
+                <button type="button" onclick="nextStep(4)">Próxima</button>
+            </div>
+            <div class="quiz-step" id="step4">
+                <p>4. Qual é o animal mais adaptado à Caatinga?</p>
+                <label><input type="radio" name="q4" value="a"> A - Onça-pintada</label><br>
+                <label><input type="radio" name="q4" value="b"> B - Tamanduá-bandeira</label><br>
+                <label><input type="radio" name="q4" value="c"> C - Tatu-bola</label><br>
+                <button type="button" onclick="nextStep(5)">Próxima</button>
+            </div>
+            <div class="quiz-step" id="step5">
+                <p>5. Observe o gráfico e responda: Qual é a porcentagem de cobertura vegetal original da Caatinga que ainda existe?</p>
+                <canvas id="caatingaChart"></canvas>
+                <label><input type="radio" name="q5" value="a"> A - 30%</label><br>
+                <label><input type="radio" name="q5" value="b"> B - 50%</label><br>
+                <label><input type="radio" name="q5" value="c"> C - 70%</label><br>
+                <button type="button" onclick="submitQuiz()">Enviar</button>
+            </div>
+        </form>
+        <div id="results" class="hidden">
+            <h2>Resultados</h2>
+            <p id="percentage"></p>
+            <p id="correct"></p>
+            <p id="incorrect"></p>
+            <canvas id="resultChart" width="400" height="200"></canvas>
+        </div>
+    </div>
+    <script>
+        var caatingaData = [70, 30];
+        var ctx = document.getElementById('caatingaChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Cobertura Original', 'Cobertura Perdida'],
+                datasets: [{
+                    label: 'Cobertura Vegetal da Caatinga',
+                    data: caatingaData,
+                    backgroundColor: ['#4CAF50', '#F44336']
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+        function nextStep(step) {
+            var currentStep = document.querySelector('.quiz-step.active');
+            currentStep.classList.remove('active');
+            document.getElementById('step' + step).classList.add('active');
+        }
+        function submitQuiz() {
+            var correctAnswers = {
+                q1: "b",
+                q2: "b",
+                q3: "a",
+                q4: "c",
+                q5: "c",
+            };
+            var totalQuestions = 5;
+            var correct = 0;
+            var form = document.getElementById('quiz');
+            var inputs = form.getElementsByTagName('input');
+            for (var i = 0; i < inputs.length; i++) {
+                if (inputs[i].type === 'radio' && inputs[i].checked) {
+                    if (inputs[i].value === correctAnswers[inputs[i].name]) {
+                        correct++;
+                    }
+                }
+            }
+            var percentage = (correct / totalQuestions) * 100;
+            document.getElementById('percentage').innerText = 'Porcentagem de acertos: ' + percentage + '%';
+            document.getElementById('correct').innerText = 'Corretas: ' + correct;
+            document.getElementById('incorrect').innerText = 'Erradas: ' + (totalQuestions - correct);
+            document.getElementById('results').classList.remove('hidden');
+            var resultCtx = document.getElementById('resultChart').getContext('2d');
+            new Chart(resultCtx, {
+                type: 'pie',
+                data: {
+                    labels: ['Corretas', 'Erradas'],
+                    datasets: [{
+                        label: 'Resultados',
+                        data: [correct, totalQuestions - correct],
+                        backgroundColor: ['#4CAF50', '#F44336']
+                    }]
+                },
+                options: {
+                    responsive: true
+                }
+            });
+        }
+    </script>
+</body>
+</html>
